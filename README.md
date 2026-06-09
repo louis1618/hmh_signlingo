@@ -87,16 +87,30 @@ flowchart TD
 
 ## ⚠️ 중요: 필수 대용량 바이너리 별도 설정 (Required Binary Setup)
 
-본 리포지토리의 핵심 코드는 포함되어 있으나, 5GB가 넘는 대용량 모션 바이너리 파일과 학습된 딥러닝 가중치 파일은 **Git 추적에서 제외(`.gitignore`)**되어 있습니다. 다른 컴퓨터에서 프로젝트를 복사하여 정상 실행하려면 **다음 두 가지 방법 중 하나를 선택하여 필수 파일을 준비해야 합니다.**
+본 리포지토리는 AI 모델 가중치 파일(`sign_model_best.pth`, `sign_model.pth`)과 데이터셋 메타 인덱스 캐시(`dataset_cache.pkl`)를 **기본적으로 깃 추적에 포함하여 제공**합니다. 따라서 실시간 웹캠 인식 기능은 복제(Clone) 즉시 사용 가능합니다.
 
-### 방법 A. 기존 리소스 다운로드 및 배치 (권장)
-기존에 구축된 바이너리 파일들을 외부 저장소(Google Drive 등)에서 다운로드하여 아래 경로에 직접 수동으로 배치합니다.
-* **배치 대상 및 경로:**
-  * `Signlingo_backend/backend/dataset_features.bin` (5.08 GB - 수어 3D 모션 데이터셋)
-  * `Signlingo_backend/backend/dataset_cache.pkl` (11.24 MB - 데이터셋 메타 인덱스 캐시)
-  * `Signlingo_backend/backend/sign_model_best.pth` (26.9 MB - PyTorch 모델 가중치 파일)
+단, 3D 아바타 수어 시연(Tutor 모드) 재생에 필요한 대용량 모션 바이너리 파일인 **`Signlingo_backend/backend/dataset_features.bin` (5.08 GB)은 깃 추적에서 제외(`.gitignore`)**되어 있습니다. 이 3D 모션 기능을 활성화하려면 **GitHub Releases** 탭에서 해당 파일을 직접 받아 아래 경로에 위치시켜야 합니다.
 
-### 방법 B. 로컬에서 데이터셋 전처리 및 AI 모델 직접 학습
+### 📦 GitHub Releases 업로드 및 복원 방법 (무료 용량 제한 우회)
+GitHub Releases 업로드 시 무료 계정은 파일당 최대 **2 GB**의 업로드 제한이 있습니다. 따라서 5GB인 `dataset_features.bin`을 업로드하고 복원하기 위해 **파일 분할 및 병합** 방식을 사용합니다.
+
+#### 1. 파일 분할 (릴리즈 업로드용 - 사용자 louis1618 실행)
+백엔드 폴더(`Signlingo_backend/backend/`)에서 터미널을 열고 아래 파이썬 명령어를 실행하여 5GB 바이너리를 1.5GB 크기(2GB 이하)의 4개 파트로 쪼갭니다:
+```bash
+python -c "import os; f=open('dataset_features.bin','rb'); [open(f'dataset_features.bin.part{i}','wb').write(f.read(1500*1024*1024)) for i in range(4)]; f.close(); print('Split complete!')"
+```
+* 생성된 `dataset_features.bin.part0`, `part1`, `part2`, `part3` 파일들을 **GitHub 저장소의 Releases 탭**에 Assets로 업로드합니다.
+
+#### 2. 파일 병합 (다운로드 및 복원용 - 타 개발자 실행)
+다른 컴퓨터에서 프로젝트를 실행하는 경우, GitHub Releases에서 4개의 파트 파일들을 모두 다운로드하여 백엔드 폴더(`Signlingo_backend/backend/`)에 넣은 후 아래 명령어로 병합하여 원본을 복원합니다:
+```bash
+python -c "import glob; parts=sorted(glob.glob('dataset_features.bin.part*')); f=open('dataset_features.bin','wb'); [f.write(open(p,'rb').read()) for p in parts]; f.close(); print('Merge complete!')"
+```
+* 병합이 완료되면 임시 다운로드한 `dataset_features.bin.part*` 파트 파일들은 안전하게 삭제해도 좋습니다.
+
+---
+
+### 방법 B. 로컬에서 데이터셋 직접 재구축
 AI Hub 원본 키포인트 ZIP 파일들을 소지하고 있는 경우, 처음부터 데이터를 가공하고 직접 학습하여 파일을 생성할 수 있습니다.
 1. AI Hub에서 다운로드한 `01_real_word_keypoint.zip.part*` 파일들을 `Signlingo_backend/` (혹은 지정한 작업 영역)에 위치시킵니다.
 2. 백엔드 가상환경(`venv`) 활성화 후, 아래 스크립트를 차례로 실행합니다:

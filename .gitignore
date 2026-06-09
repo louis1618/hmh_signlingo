@@ -145,11 +145,8 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# SignLingo Dataset & Model weights (HEAVY BINARIES)
+# SignLingo Dataset & Model weights (dataset_features.bin ONLY excluded)
 Signlingo_backend/backend/dataset_features.bin
-Signlingo_backend/backend/dataset_cache.pkl
-Signlingo_backend/backend/sign_model.pth
-Signlingo_backend/backend/sign_model_best.pth
 Signlingo_backend/backend/frontend_dump.npy
 Signlingo_backend/backend/venv/
 Signlingo_backend/backend/__pycache__/
