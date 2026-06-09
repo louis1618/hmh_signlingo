@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+torch
+numpy
+pandas
+google-genai
+python-dotenv
+pydantic
