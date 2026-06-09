@@ -89,24 +89,14 @@ flowchart TD
 
 본 리포지토리는 AI 모델 가중치 파일(`sign_model_best.pth`, `sign_model.pth`)과 데이터셋 메타 인덱스 캐시(`dataset_cache.pkl`)를 **기본적으로 깃 추적에 포함하여 제공**합니다. 따라서 실시간 웹캠 인식 기능은 복제(Clone) 즉시 사용 가능합니다.
 
-단, 3D 아바타 수어 시연(Tutor 모드) 재생에 필요한 대용량 모션 바이너리 파일인 **`Signlingo_backend/backend/dataset_features.bin` (5.08 GB)은 깃 추적에서 제외(`.gitignore`)**되어 있습니다. 이 3D 모션 기능을 활성화하려면 **GitHub Releases** 탭에서 해당 파일을 직접 받아 아래 경로에 위치시켜야 합니다.
+단, 3D 아바타 수어 시연(Tutor 모드) 재생에 필요한 대용량 모션 바이너리 파일인 **`Signlingo_backend/backend/dataset_features.bin` (5.08 GB)은 깃 추적에서 제외(`.gitignore`)**되어 있습니다. 이 3D 모션 기능을 활성화하려면 아래 클라우드 링크에서 단일 파일을 직접 내려받아 지정 경로에 배치해야 합니다.
 
-### 📦 GitHub Releases 업로드 및 복원 방법 (무료 용량 제한 우회)
-GitHub Releases 업로드 시 무료 계정은 파일당 최대 **2 GB**의 업로드 제한이 있습니다. 따라서 5GB인 `dataset_features.bin`을 업로드하고 복원하기 위해 **파일 분할 및 병합** 방식을 사용합니다.
-
-#### 1. 파일 분할 (릴리즈 업로드용 - 사용자 louis1618 실행)
-백엔드 폴더(`Signlingo_backend/backend/`)에서 터미널을 열고 아래 파이썬 명령어를 실행하여 5GB 바이너리를 1.5GB 크기(2GB 이하)의 4개 파트로 쪼갭니다:
-```bash
-python -c "import os; f=open('dataset_features.bin','rb'); [open(f'dataset_features.bin.part{i}','wb').write(f.read(1500*1024*1024)) for i in range(4)]; f.close(); print('Split complete!')"
-```
-* 생성된 `dataset_features.bin.part0`, `part1`, `part2`, `part3` 파일들을 **GitHub 저장소의 Releases 탭**에 Assets로 업로드합니다.
-
-#### 2. 파일 병합 (다운로드 및 복원용 - 타 개발자 실행)
-다른 컴퓨터에서 프로젝트를 실행하는 경우, GitHub Releases에서 4개의 파트 파일들을 모두 다운로드하여 백엔드 폴더(`Signlingo_backend/backend/`)에 넣은 후 아래 명령어로 병합하여 원본을 복원합니다:
-```bash
-python -c "import glob; parts=sorted(glob.glob('dataset_features.bin.part*')); f=open('dataset_features.bin','wb'); [f.write(open(p,'rb').read()) for p in parts]; f.close(); print('Merge complete!')"
-```
-* 병합이 완료되면 임시 다운로드한 `dataset_features.bin.part*` 파트 파일들은 안전하게 삭제해도 좋습니다.
+### 📥 모션 데이터셋 다운로드 및 배치 방법
+1. 아래 클라우드 공유 링크에서 `dataset_features.bin` (5.08 GB) 파일을 다운로드합니다:
+   * **[Mega.nz 다운로드 링크 (여기에 링크 주소를 입력하세요)](YOUR_MEGA_DOWNLOAD_LINK_HERE)**
+2. 다운로드한 `dataset_features.bin` 파일을 아래 경로에 위치시킵니다:
+   * **배치 경로:** `Signlingo_backend/backend/dataset_features.bin`
+3. 정상적으로 파일 배치가 완료되면 백엔드 서버 구동 시 3D 아바타 시연 모드가 정상 활성화됩니다.
 
 ---
 
