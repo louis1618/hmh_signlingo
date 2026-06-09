@@ -93,7 +93,7 @@ flowchart TD
 
 ### 📥 모션 데이터셋 다운로드 및 배치 방법
 1. 아래 클라우드 공유 링크에서 `dataset_features.bin` (5.08 GB) 파일을 다운로드합니다:
-   * **[Mega.nz 다운로드 링크 (여기에 링크 주소를 입력하세요)](YOUR_MEGA_DOWNLOAD_LINK_HERE)**
+   * **[Mega.nz 다운로드 링크](https://mega.nz/file/hmdwHBpD#vYAPfCnC39kETlfpBRuWyssG2da06liWWyDldlf3Yqk)**
 2. 다운로드한 `dataset_features.bin` 파일을 아래 경로에 위치시킵니다:
    * **배치 경로:** `Signlingo_backend/backend/dataset_features.bin`
 3. 정상적으로 파일 배치가 완료되면 백엔드 서버 구동 시 3D 아바타 시연 모드가 정상 활성화됩니다.
