@@ -53,7 +53,7 @@ SignLingo는 영상 시청 중심의 기존 수어 학습이 가진 한계를 �
 
 ```mermaid
 flowchart TD
-    subgraph Client [Client 브라우저 (React + R3F)]
+    subgraph Client ["Client 브라우저 (React + R3F)"]
         A[웹캠 영상] --> B[MediaPipe Vision Tasks]
         B -->|33 Pose & 42 Hand Keypoints| C[Feature Extractor & Normalizer]
         C -->|100-Dim Normalised Coordinates| D[Sliding Window Buffer 124 frames]
@@ -66,7 +66,7 @@ flowchart TD
         I[Tutor Playback Data] -->|GET /api/motion/word| G
     end
 
-    subgraph Server [AI 백엔드 (FastAPI + PyTorch)]
+    subgraph Server ["AI 백엔드 (FastAPI + PyTorch)"]
         E -->|WS /ws/recognize - Float32 binary| J[WebSocket Manager]
         J -->|Torch Tensor Buffer| K[SignLanguageModel]
         K -->|Bi-LSTM + Multihead Attention| L[Softmax Classification]
@@ -77,7 +77,7 @@ flowchart TD
         P -->|Pseudo-MediaPipe JSON| I
     end
     
-    subgraph Gemini [Gemini AI]
+    subgraph Gemini ["Gemini AI"]
         Q[Translator.jsx] -.->|POST /api/generate-sentence| R[Gemini 2.5 Flash]
         R -.->|Korean Sentence Generation| Q
     end
@@ -85,28 +85,31 @@ flowchart TD
 
 ---
 
-## 📁 프로젝트 구조 (Project Structure)
+## ⚠️ 중요: 필수 대용량 바이너리 별도 설정 (Required Binary Setup)
 
-### Frontend (`Signlingo_frontend`)
-* [src/App.jsx](Signlingo_frontend/src/App.jsx) : 메인 앱 컨트롤러, 탭 네비게이션 및 IndexedDB 시딩 흐름 제어.
-* [src/components/AvatarCanvas.jsx](Signlingo_/Signlingo_frontend/src/components/AvatarCanvas.jsx) : Three.js/R3F 기반 Canvas로 아바타 및 조명, 마우스 인터랙션 렌더링.
-* [src/hooks/useVRM.js](Signlingo_/Signlingo_frontend/src/hooks/useVRM.js) : VRMLoaderPlugin을 이용하여 VRM 캐릭터 아바타 비동기 로딩 및 방향성 정렬.
-* [src/services/vrmSolver.js](Signlingo_/Signlingo_frontend/src/services/vrmSolver.js) : Kalidokit을 결합하여 실시간/시범 모션 데이터를 VRM 본(Bone) 쿼터니언 값에 부드럽게 Slerp 바인딩.
-* [src/services/mediapipeEngine.js](Signlingo_/Signlingo_frontend/src/services/mediapipeEngine.js) : 위상학적 매핑(MediaPipe → OpenPose), 절대 좌표 목(Neck) 기준 정규화 및 `torsoSize` 스케일링, 프레임 유실 시 Wrist 붕괴(Collapse) 로직 담당.
-* [src/services/dbService.js](Signlingo_/Signlingo_frontend/src/services/dbService.js) : IndexedDB 스키마 구성, 백엔드로부터 Curriculum 시드 데이터를 주입받아 로컬 캐싱 수행.
-* [src/pages/LessonRoom/LessonRoom.jsx](Signlingo_/Signlingo_frontend/src/pages/LessonRoom/LessonRoom.jsx) : 학습방 화면. 3D 아바타 수어 재생(Tutor 모드) 및 실시간 웹캠 인식 학습(Practice 모드) 지원.
-* [src/pages/Translator/Translator.jsx](Signlingo_/Signlingo_frontend/src/pages/Translator/Translator.jsx) : 실시간 연속 수어 번역 페이지. 슬라이딩 윈도우와 중복 제거를 결합한 실시간 번역 문장 출력.
-* [src/pages/Admin/CMSAdmin.jsx](Signlingo_/Signlingo_frontend/src/pages/Admin/CMSAdmin.jsx) : 챕터, 레슨 관리 및 웹캠 동작 모션 캡처 저장용 CMS.
+본 리포지토리의 핵심 코드는 포함되어 있으나, 5GB가 넘는 대용량 모션 바이너리 파일과 학습된 딥러닝 가중치 파일은 **Git 추적에서 제외(`.gitignore`)**되어 있습니다. 다른 컴퓨터에서 프로젝트를 복사하여 정상 실행하려면 **다음 두 가지 방법 중 하나를 선택하여 필수 파일을 준비해야 합니다.**
 
-### Backend (`Signlingo_backend`)
-* [backend/main.py](Signlingo_/Signlingo_backend/backend/main.py) : FastAPI 서버 엔트리포인트. WebSocket 추론(24,000바이트 binary 수신), 대용량 모션 청크 부분 로딩(`/api/motion/{word}`), Gemini 기반 문장 생성 API 제공.
-* [backend/train.py](Signlingo_/Signlingo_backend/backend/train.py) : `SignLanguageModel` 아키텍처(Linear Projection + Bi-LSTM + Multihead Attention + Temp Mean Pooling + FC Head) 및 가중치 감쇠(AdamW), OneCycleLR 스케줄링 학습 루프.
-* [backend/dataset.py](Signlingo_/Signlingo_backend/backend/dataset.py) : `numpy.memmap` 기반 PyTorch Dataset 설계. 대용량 디스크 데이터셋(1GB~5GB)을 메모리 폭증 없이 고속 미니배치 구성.
-* [backend/preprocess_stream.py](Signlingo_/Signlingo_backend/backend/preprocess_stream.py) : AI 허브 수어 단어 OpenPose 키포인트 ZIP 파일을 파싱하여 초고속 바이너리 피처 추출 및 병합.
-* [backend/preprocess_sentence.py](Signlingo_/Signlingo_backend/backend/preprocess_sentence.py) : AI 허브 수어 문장 데이터셋 내의 형태소(Morpheme) 레이블 메타데이터와 싱크하여, 연속된 문장 시계열 속에서 단어 단위 구간을 잘라내어 학습 데이터셋에 추가.
-* [backend/preprocess_vrm.py](Signlingo_/Signlingo_backend/backend/preprocess_vrm.py) : 훈련 데이터셋 내의 대표 시퀀스(1개 단어당 1개)를 pseudo-MediaPipe 포맷으로 변환하여 프론트엔드가 즉시 3D 재생할 수 있도록 처리하는 오프라인 파이프라인.
-* [backend/diagnose.py](Signlingo_/Signlingo_backend/backend/diagnose.py) : 훈련 데이터셋 피처 분포와 웹캠 프론트엔드 실시간 덤프(`frontend_dump.npy`) 간의 통계적 평균/편차를 검증하여 도메인 갭을 역추적하는 심층 진단 도구.
-* [backend/evaluate.py](Signlingo_/Signlingo_backend/backend/evaluate.py) : Stratified 80/20 Shuffle Split을 적용하여 과적합 격차(Gap) 분석 및 Top-1, Top-5, Top-10 정확도 리포트 도구.
+### 방법 A. 기존 리소스 다운로드 및 배치 (권장)
+기존에 구축된 바이너리 파일들을 외부 저장소(Google Drive 등)에서 다운로드하여 아래 경로에 직접 수동으로 배치합니다.
+* **배치 대상 및 경로:**
+  * `Signlingo_backend/backend/dataset_features.bin` (5.08 GB - 수어 3D 모션 데이터셋)
+  * `Signlingo_backend/backend/dataset_cache.pkl` (11.24 MB - 데이터셋 메타 인덱스 캐시)
+  * `Signlingo_backend/backend/sign_model_best.pth` (26.9 MB - PyTorch 모델 가중치 파일)
+
+### 방법 B. 로컬에서 데이터셋 전처리 및 AI 모델 직접 학습
+AI Hub 원본 키포인트 ZIP 파일들을 소지하고 있는 경우, 처음부터 데이터를 가공하고 직접 학습하여 파일을 생성할 수 있습니다.
+1. AI Hub에서 다운로드한 `01_real_word_keypoint.zip.part*` 파일들을 `Signlingo_backend/` (혹은 지정한 작업 영역)에 위치시킵니다.
+2. 백엔드 가상환경(`venv`) 활성화 후, 아래 스크립트를 차례로 실행합니다:
+   ```bash
+   # 1. OpenPose 데이터 병합 및 100차원 피처 바이너리/캐시 빌드
+   python preprocess_stream.py
+   
+   # 2. 3D 아바타 재생용 pseudo-MediaPipe 궤적이 탑재된 curriculum.json 생성
+   python preprocess_vrm.py
+   
+   # 3. AI 모델 학습 시작 (학습 완료 시 sign_model_best.pth 가 자동 빌드됨)
+   python train.py
+   ```
 
 ---
 
@@ -127,7 +130,7 @@ flowchart TD
    ```bash
    pip install -r requirements.txt
    ```
-3. 백엔드 서버 구동:
+3. 백엔드 서버 구동 (※ 위의 대용량 바이너리 및 모델 가중치 파일 배치가 완료된 상태여야 합니다):
    ```bash
    python main.py
    ```
