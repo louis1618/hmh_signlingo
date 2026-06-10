@@ -8,8 +8,9 @@ import pickle
 from tqdm import tqdm
 from collections import defaultdict
 
-workspace = r"C:\Users\louis\Documents\.dev\HMH\Signlingo"
-backend_dir = os.path.join(workspace, "backend")
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+workspace = os.path.dirname(backend_dir)
+
 
 MAX_FRAMES = 60
 FEATURE_DIM = 100

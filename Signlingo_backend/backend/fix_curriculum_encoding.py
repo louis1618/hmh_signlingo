@@ -2,9 +2,13 @@ import pickle
 import json
 import sys
 
+import os
+
 sys.stdout.reconfigure(encoding='utf-8')
 
-cache_file = r"C:\Users\louis\Documents\.dev\.Surnin\HMH\Signlingo_\Signlingo_backend\backend\dataset_cache.pkl"
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+cache_file = os.path.join(backend_dir, "dataset_cache.pkl")
+
 try:
     with open(cache_file, "rb") as f:
         data = pickle.load(f)
@@ -29,7 +33,7 @@ try:
             "variants": []
         })
         
-    out_file = r"C:\Users\louis\Documents\.dev\.Surnin\HMH\Signlingo_\Signlingo_backend\backend\curriculum.json"
+    out_file = os.path.join(backend_dir, "curriculum.json")
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(curriculum, f, ensure_ascii=False, indent=2)
     print(f"Wrote {len(curriculum)} items to {out_file}")

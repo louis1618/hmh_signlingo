@@ -17,10 +17,13 @@ from dataset import SignLanguageDataset, FEATURE_DIM
 from train import SignLanguageModel
 
 # ─── Load dataset ───
-KEYPOINTS_DIR = r"C:\Users\louis\Documents\.dev\HMH\Signlingo\dataset\keypoints"
-MORPHEME_DIR = r"C:\Users\louis\Documents\.dev\HMH\Signlingo\dataset\morpheme\morpheme"
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+workspace = os.path.dirname(backend_dir)
+KEYPOINTS_DIR = os.path.join(workspace, "dataset", "keypoints")
+MORPHEME_DIR = os.path.join(workspace, "dataset", "morpheme", "morpheme")
 
 dataset = SignLanguageDataset(KEYPOINTS_DIR, MORPHEME_DIR, max_frames=60, fps=30, augment=False)
+
 NUM_CLASSES = len(dataset.word_to_idx)
 
 # ─── Load model ───

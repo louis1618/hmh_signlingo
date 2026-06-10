@@ -11,10 +11,12 @@ def main():
     cache_path = os.path.join(os.path.dirname(__file__), 'dataset_cache.pkl')
     if not os.path.exists(cache_path):
         print("dataset_cache.pkl not found! Generating cache...")
-        from dataset import SignLanguageDataset
-        keypoints_dir = r"C:\Users\louis\Documents\.dev\HMH\Signlingo\dataset\keypoints"
-        morpheme_dir = r"C:\Users\louis\Documents\.dev\HMH\Signlingo\dataset\morpheme"
+        backend_dir = os.path.dirname(os.path.abspath(__file__))
+        workspace = os.path.dirname(backend_dir)
+        keypoints_dir = os.path.join(workspace, "dataset", "keypoints")
+        morpheme_dir = os.path.join(workspace, "dataset", "morpheme")
         ds = SignLanguageDataset(keypoints_dir, morpheme_dir)
+
 
     print("Loading dataset metadata...")
     with open(cache_path, 'rb') as f:
@@ -32,7 +34,10 @@ def main():
     lbl_mmap = np.memmap(labels_file, dtype='int64', mode='w+',
                          shape=(num_samples,))
 
-    kp_dir = r"C:\Users\louis\Documents\.dev\HMH\Signlingo\dataset\keypoints"
+    backend_dir = os.path.dirname(os.path.abspath(__file__))
+    workspace = os.path.dirname(backend_dir)
+    kp_dir = os.path.join(workspace, "dataset", "keypoints")
+
 
     print("Compiling (one-time)...")
     for i, s in enumerate(tqdm(samples, desc="Processing")):

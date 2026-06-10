@@ -128,7 +128,8 @@ def train_model(model, dataloader, num_epochs=30, learning_rate=0.001):
 
 
 if __name__ == '__main__':
-    BACKEND_DIR = r"C:\Users\louis\Documents\.dev\HMH\Signlingo\backend"
+    BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
     INPUT_SIZE = FEATURE_DIM  # 100 (normalized)
     HIDDEN_SIZE = 512

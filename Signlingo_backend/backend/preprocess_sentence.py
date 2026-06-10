@@ -26,9 +26,10 @@ def merge_parts(base_zip_name):
     return base_zip_name
 
 def process_sentence_data():
-    workspace = r"C:\Users\louis\Documents\.dev\HMH\Signlingo"
+    backend_dir = os.path.dirname(os.path.abspath(__file__))
+    workspace = os.path.dirname(backend_dir)
     data_dir = os.path.join(workspace, ".data")
-    backend_dir = os.path.join(workspace, "backend")
+
     
     bin_path = os.path.join(backend_dir, 'dataset_features.bin')
     cache_path = os.path.join(backend_dir, 'dataset_cache.pkl')
